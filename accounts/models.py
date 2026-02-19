@@ -13,6 +13,13 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default='MORADOR')
     pontos_participacao = models.IntegerField(default=0)
+    unidade = models.ForeignKey(
+        'condominio.UnidadeHabitacional',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='moradores'
+    )
 
     def __str__(self):
         return f"{self.user.username} - {self.tipo}"

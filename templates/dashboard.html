@@ -14,6 +14,25 @@
     </div>
 
 </div>
+<div class="d-flex align-items-center gap-2 mb-3">
+
+    <a href="?mes={{ mes_anterior }}" class="btn btn-outline-secondary">
+        ← Mês anterior
+    </a>
+
+    <form method="get" class="d-inline">
+        <input type="month" name="mes" value="{{ mes_selecionado }}" class="form-control d-inline w-auto">
+        <button type="submit" class="btn btn-primary btn-sm">
+            Ir
+        </button>
+    </form>
+
+    <a href="?mes={{ mes_proximo }}" class="btn btn-outline-secondary">
+        Próximo mês →
+    </a>
+
+</div>
+
 
 <div class="card mt-4">
     <div class="card-header">
@@ -29,7 +48,6 @@
 {% endblock %}
 
 {% block extra_js %}
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
@@ -39,15 +57,21 @@
         type: 'bar',
         data: {
             labels: {{ labels|safe }},
-            datasets: {{ datasets|safe }}
+            datasets: [{
+                label: 'Kg reciclados',
+                data: {{ valores|safe }},
+                backgroundColor: [
+                    'rgba(54, 162, 235, 0.7)',
+                    'rgba(255, 99, 132, 0.7)',
+                    'rgba(75, 192, 192, 0.7)',
+                    'rgba(153, 102, 255, 0.7)',
+                    'rgba(255, 206, 86, 0.7)',
+                    'rgba(201, 203, 207, 0.7)'
+                ]
+            }]
         },
         options: {
             responsive: true,
-            plugins: {
-                legend: {
-                    position: 'top'
-                }
-            },
             scales: {
                 y: {
                     beginAtZero: true

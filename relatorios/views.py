@@ -1,20 +1,17 @@
+import json
+from datetime import datetime
+
+from django.utils import timezone
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Sum
-
+from dateutil.relativedelta import relativedelta
 from accounts.mixins import AdminRequiredMixin
 from residuos.models import RegistroColeta, TipoResiduo
 
 
 class AdminOnlyView(AdminRequiredMixin, TemplateView):
     template_name = "admin_area.html"
-
-from django.db.models import Sum
-from django.db.models.functions import TruncMonth
-from django.utils.timezone import now
-import json
-
-
 
 class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = "dashboard.html"
@@ -30,51 +27,45 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         if profile.tipo == "MORADOR":
             queryset = queryset.filter(morador=user)
 
-        # Agrupar por mês e tipo
-        dados = (
-            queryset
-            .annotate(mes=TruncMonth('data'))
-            .values('mes', 'tipo_residuo')
-            .annotate(total=Sum('quantidade'))
-            .order_by('mes')
+        mes_param = self.request.GET.get("mes")
+
+        if mes_param:
+            ano, mes = map(int, mes_param.split("-"))
+            data_base = datetime(ano, mes, 1)
+        else:
+            data_base = timezone.now().replace(day=1)
+
+        # Filtrar mês selecionado
+        queryset = queryset.filter(
+            data__year=data_base.year,
+            data__month=data_base.month
         )
 
-        meses = sorted(set(item['mes'] for item in dados if item['mes']))
+        # ===== CALCULAR NAVEGAÇÃO =====
+        mes_anterior = (data_base - relativedelta(months=1)).strftime("%Y-%m")
+        mes_proximo = (data_base + relativedelta(months=1)).strftime("%Y-%m")
 
-        labels = [mes.strftime('%b/%Y') for mes in meses]
+        context["mes_anterior"] = mes_anterior
+        context["mes_proximo"] = mes_proximo
+        context["mes_selecionado"] = data_base.strftime("%Y-%m")
 
-        # Estrutura base
-        datasets = {}
+        # ===== AGRUPAR POR TIPO =====
+        dados = (
+            queryset
+            .values('tipo_residuo')
+            .annotate(total=Sum('quantidade'))
+        )
+
+        labels = []
+        valores = []
 
         for tipo, _ in TipoResiduo.choices:
-            datasets[tipo] = [0] * len(meses)
+            labels.append(tipo.capitalize())
+            total = next((item['total'] for item in dados if item['tipo_residuo'] == tipo), 0)
+            valores.append(float(total) if total else 0)
 
-        # Preencher dados
-        for item in dados:
-            mes_index = meses.index(item['mes'])
-            datasets[item['tipo_residuo']][mes_index] = float(item['total'])
-
-        # Converter para formato Chart.js
-        chart_datasets = []
-
-        cores = {
-            'PAPEL': 'rgba(54, 162, 235, 0.7)',
-            'PLASTICO': 'rgba(255, 99, 132, 0.7)',
-            'VIDRO': 'rgba(75, 192, 192, 0.7)',
-            'METAL': 'rgba(153, 102, 255, 0.7)',
-            'ORGANICO': 'rgba(255, 206, 86, 0.7)',
-            'OUTROS': 'rgba(201, 203, 207, 0.7)',
-        }
-
-        for tipo, valores in datasets.items():
-            chart_datasets.append({
-                'label': tipo.capitalize(),
-                'data': valores,
-                'backgroundColor': cores.get(tipo, 'rgba(0,0,0,0.5)')
-            })
-
-        context['labels'] = json.dumps(labels)
-        context['datasets'] = json.dumps(chart_datasets)
+        context["labels"] = json.dumps(labels)
+        context["valores"] = json.dumps(valores)
 
         return context
 

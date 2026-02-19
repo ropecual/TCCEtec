@@ -26,4 +26,5 @@ urlpatterns = [
 	path('residuos/', include('residuos.urls')),
 
 	path('', include('accounts.urls')),
+	path("", include("condominio.urls")),
 ]
