@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sistema Coleta</title>
+
+    <!-- AdminLTE CSS -->
+    <link rel="stylesheet" href="{% static 'adminlte/dist/css/adminlte.min.css' %}">
+</head>
+
+<body class="layout-fixed sidebar-expand-lg">
+
+<div class="app-wrapper">
+
+    <!-- Navbar -->
+    <nav class="app-header navbar navbar-expand bg-body">
+        <div class="container-fluid">
+            <span class="navbar-brand">Sistema Coleta Seletiva</span>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <aside class="app-sidebar bg-body-secondary shadow">
+        <div class="sidebar-brand">
+            <span class="brand-text fw-light">Coleta</span>
+        </div>
+
+        <div class="sidebar-menu">
+            <nav>
+                <ul class="nav nav-pills nav-sidebar flex-column">
+
+                    <li class="nav-item">
+                        <a href="{% url 'dashboard' %}" class="nav-link">
+                            <p>Dashboard</p>
+                        </a>
+                    </li>
+
+                </ul>
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Conteúdo -->
+    <main class="app-main">
+        <div class="app-content p-3">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </main>
+
+</div>
+
+<!-- AdminLTE JS -->
+<script src="{% static 'adminlte/dist/js/adminlte.min.js' %}"></script>
+
+</body>
+</html>
