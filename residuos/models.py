@@ -12,13 +12,12 @@ class TipoResiduo(models.TextChoices):
     OUTROS = 'OUTROS', 'Outros'
 
 
-
-
 class RegistroColeta(models.Model):
 
     morador = models.ForeignKey(
         User,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name='registros'
     )
 
     tipo_residuo = models.CharField(
@@ -31,14 +30,32 @@ class RegistroColeta(models.Model):
     data = models.DateField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.morador.username} - {self.tipo_residuo} - {self.quantidade}kg"
+        if self.morador_id:
+            return f"{self.morador.username} - {self.tipo_residuo} - {self.quantidade}kg"
+        return f"Registro - {self.tipo_residuo}"
 
     def clean(self):
+        """
+        Validação defensiva.
+        Evita erro quando o morador ainda não foi atribuído.
+        """
+        if not self.morador_id:
+            return
+
         if self.morador.profile.tipo != 'MORADOR':
             raise ValidationError("Apenas moradores podem registrar resíduos.")
 
+        if self.quantidade <= 0:
+            raise ValidationError("A quantidade deve ser maior que zero.")
+
     def save(self, *args, **kwargs):
+        """
+        Salva normalmente e depois atualiza pontuação do perfil.
+        Evita erro caso morador ainda não esteja definido.
+        """
         super().save(*args, **kwargs)
-        profile = self.morador.profile
-        profile.pontos_participacao += int(self.quantidade)
-        profile.save()
+
+        if self.morador_id:
+            profile = self.morador.profile
+            profile.pontos_participacao += int(self.quantidade)
+            profile.save()

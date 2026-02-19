@@ -9,26 +9,51 @@
             <div class="card-body">
                 <h2>{{ total_kg }} kg</h2>
                 <p>Total Reciclado</p>
-                <small>Perfil: {{ tipo_usuario }}</small>
             </div>
         </div>
     </div>
 
 </div>
 
-<div class="card mt-3">
+<div class="card mt-4">
+    <div class="card-header">
+        <h5>Reciclagem por Tipo (Mensal)</h5>
+    </div>
+
     <div class="card-body">
-        <h5>Coleta por Tipo</h5>
-
-        <ul>
-            {% for item in por_tipo %}
-                <li>{{ item.tipo_residuo }} - {{ item.total }} kg</li>
-            {% empty %}
-                <li>Nenhum registro encontrado.</li>
-            {% endfor %}
-        </ul>
-
+        <canvas id="graficoMensal"></canvas>
     </div>
 </div>
 
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const ctx = document.getElementById('graficoMensal');
+
+    const grafico = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ labels|safe }},
+            datasets: {{ datasets|safe }}
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
 {% endblock %}

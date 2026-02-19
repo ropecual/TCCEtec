@@ -8,6 +8,8 @@
 
     <!-- AdminLTE CSS -->
     <link rel="stylesheet" href="{% static 'adminlte/dist/css/adminlte.min.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
 </head>
 
 <body class="layout-fixed sidebar-expand-lg">
@@ -23,24 +25,69 @@
 
     <!-- Sidebar -->
     <aside class="app-sidebar bg-body-secondary shadow">
-        <div class="sidebar-brand">
-            <span class="brand-text fw-light">Coleta</span>
-        </div>
 
-        <div class="sidebar-menu">
-            <nav>
-                <ul class="nav nav-pills nav-sidebar flex-column">
+        <div class="sidebar-wrapper">
 
+            <nav class="mt-2">
+                <ul class="nav nav-pills nav-sidebar flex-column"
+                    data-lte-toggle="treeview"
+                    role="menu">
+
+                    <!-- Dashboard -->
                     <li class="nav-item">
-                        <a href="{% url 'dashboard' %}" class="nav-link">
+                        <a href="{% url 'dashboard' %}"
+                           class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                            <i class="nav-icon bi bi-speedometer2"></i>
                             <p>Dashboard</p>
                         </a>
                     </li>
 
+                    {% if user.is_authenticated %}
+
+                    {% if user.profile.tipo == "ADMIN" %}
+
+                    <li class="nav-item">
+                        <a href="{% url 'admin_area' %}"
+                           class="nav-link {% if request.resolver_match.url_name == 'admin_area' %}active{% endif %}">
+                            <i class="nav-icon bi bi-shield-lock"></i>
+                            <p>Área Administrativa</p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="/admin/" class="nav-link">
+                            <i class="nav-icon bi bi-gear"></i>
+                            <p>Painel Django</p>
+                        </a>
+                    </li>
+
+                    {% elif user.profile.tipo == "MORADOR" %}
+
+                    <li class="nav-item">
+                        <a href="{% url 'registrar_residuo' %}" class="nav-link">
+                            <i class="nav-icon bi bi-recycle"></i>
+                            <p>Registrar Resíduo</p>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a href="{% url 'meus_registros' %}" class="nav-link">
+                            <i class="nav-icon bi bi-clock-history"></i>
+                            <p>Meu Histórico</p>
+                        </a>
+                    </li>
+
+                    {% endif %}
+
+                    {% endif %}
+
                 </ul>
             </nav>
+
         </div>
+
     </aside>
+
 
     <!-- Conteúdo -->
     <main class="app-main">
@@ -54,6 +101,7 @@
 
 <!-- AdminLTE JS -->
 <script src="{% static 'adminlte/dist/js/adminlte.min.js' %}"></script>
+{% block extra_js %}{% endblock %}
 
 </body>
 </html>
