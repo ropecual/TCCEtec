@@ -1,8 +1,14 @@
 from django.views.generic import TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Sum
+
+from accounts.mixins import AdminRequiredMixin
 from residuos.models import RegistroColeta
 
+
+
+class AdminOnlyView(AdminRequiredMixin, TemplateView):
+    template_name = "admin_area.html"
 
 class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = "dashboard.html"
