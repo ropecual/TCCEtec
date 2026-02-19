@@ -61,6 +61,14 @@
                         </a>
                     </li>
 
+                    <li class="nav-item">
+                        <a href="{% url 'condominio_list' %}" class="nav-link">
+                            <i class="nav-icon bi bi-building"></i>
+                            <p>Condomínios</p>
+                        </a>
+                    </li>
+
+
                     {% elif user.profile.tipo == "MORADOR" %}
 
                     <li class="nav-item">

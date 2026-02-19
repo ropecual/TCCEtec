@@ -1,14 +1,16 @@
 from django.urls import path
 from .views import (
-    UnidadeListView,
-    UnidadeCreateView,
-    UnidadeUpdateView,
-    UnidadeDeleteView,
+    CondominioListView,
+    CondominioCreateView,
+    CondominioUpdateView,
+    CondominioDeleteView,
 )
 
+
 urlpatterns = [
-    path("unidades/", UnidadeListView.as_view(), name="unidade_list"),
-    path("unidades/nova/", UnidadeCreateView.as_view(), name="unidade_create"),
-    path("unidades/<int:pk>/editar/", UnidadeUpdateView.as_view(), name="unidade_update"),
-    path("unidades/<int:pk>/excluir/", UnidadeDeleteView.as_view(), name="unidade_delete"),
+    path("condominios/", CondominioListView.as_view(), name="condominio_list"),
+    path("condominios/novo/", CondominioCreateView.as_view(), name="condominio_create"),
+    path("condominios/<int:pk>/editar/", CondominioUpdateView.as_view(), name="condominio_update"),
+    path("condominios/<int:pk>/excluir/", CondominioDeleteView.as_view(), name="condominio_delete"),
+
 ]
