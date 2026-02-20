@@ -2,12 +2,14 @@ from django.views.generic import CreateView, ListView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
+
 from .models import RegistroColeta
+from .forms import RegistroColetaForm
 
 
 class RegistroCreateView(LoginRequiredMixin, CreateView):
     model = RegistroColeta
-    fields = ['tipo_residuo', 'quantidade']
+    form_class = RegistroColetaForm
     template_name = 'residuos/registro_form.html'
     success_url = reverse_lazy('dashboard')
 
@@ -19,7 +21,6 @@ class RegistroCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.morador = self.request.user
         return super().form_valid(form)
-
 
 
 class RegistroListView(LoginRequiredMixin, ListView):

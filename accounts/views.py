@@ -1,12 +1,17 @@
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import reverse_lazy
+from django.views import View
 from django.views.generic import ListView, UpdateView
-from django.urls import reverse_lazy
-from django.shortcuts import redirect
-from accounts.mixins import AdminRequiredMixin
+from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
-from .forms import ProfileForm, UserUpdateForm
 
+from accounts.mixins import AdminRequiredMixin
+from .forms import UserCreateForm, ProfileForm, UserUpdateForm
+
+
+# ------------------------
+# LOGIN / LOGOUT
+# ------------------------
 
 class CustomLoginView(LoginView):
     template_name = 'accounts/login.html'
@@ -17,13 +22,60 @@ class CustomLogoutView(LogoutView):
     next_page = reverse_lazy('login')
 
 
-
+# ------------------------
+# LISTAGEM DE USUÁRIOS
+# ------------------------
 
 class UserListView(AdminRequiredMixin, ListView):
     model = User
     template_name = "accounts/user_list.html"
     context_object_name = "usuarios"
 
+
+# ------------------------
+# CRIAÇÃO DE USUÁRIO
+# ------------------------
+
+class UserCreateView(AdminRequiredMixin, View):
+
+    template_name = "accounts/user_create.html"
+
+    def get(self, request):
+        user_form = UserCreateForm()
+        profile_form = ProfileForm()
+        return render(request, self.template_name, {
+            "user_form": user_form,
+            "profile_form": profile_form
+        })
+
+    def post(self, request):
+        user_form = UserCreateForm(request.POST)
+        profile_form = ProfileForm(request.POST)
+
+        if user_form.is_valid() and profile_form.is_valid():
+
+            # Criar usuário
+            user = user_form.save(commit=False)
+            user.set_password(user_form.cleaned_data["password"])
+            user.save()
+
+            # Atualizar profile criado pelo signal
+            profile = user.profile
+            profile.tipo = profile_form.cleaned_data["tipo"]
+            profile.unidade = profile_form.cleaned_data["unidade"]
+            profile.save()
+
+            return redirect("user_list")
+
+        return render(request, self.template_name, {
+            "user_form": user_form,
+            "profile_form": profile_form
+        })
+
+
+# ------------------------
+# EDIÇÃO DE USUÁRIO
+# ------------------------
 
 class UserUpdateView(AdminRequiredMixin, UpdateView):
     model = User

@@ -62,30 +62,34 @@
                     <li class="nav-header">ADMINISTRAÇÃO</li>
 
                     <li class="nav-item">
-                        <a href="{% url 'condominio_list' %}" class="nav-link">
+                        <a href="{% url 'condominio_list' %}"
+                           class="nav-link {% if request.resolver_match.url_name == 'condominio_list' %}active{% endif %}">
                             <i class="nav-icon bi bi-building"></i>
                             <p>Condomínios</p>
                         </a>
                     </li>
 
                     <li class="nav-item">
-                        <a href="{% url 'bloco_list' %}" class="nav-link">
+                        <a href="{% url 'bloco_list' %}"
+                           class="nav-link {% if request.resolver_match.url_name == 'bloco_list' %}active{% endif %}">
                             <i class="nav-icon bi bi-layers"></i>
                             <p>Blocos</p>
                         </a>
                     </li>
 
                     <li class="nav-item">
-                        <a href="{% url 'unidade_list' %}" class="nav-link">
+                        <a href="{% url 'unidade_list' %}"
+                           class="nav-link {% if request.resolver_match.url_name == 'unidade_list' %}active{% endif %}">
                             <i class="nav-icon bi bi-house"></i>
                             <p>Unidades</p>
                         </a>
                     </li>
 
                     <li class="nav-item">
-                        <a href="{% url 'user_list' %}" class="nav-link">
+                        <a href="{% url 'user_list' %}"
+                           class="nav-link {% if request.resolver_match.url_name in 'user_list user_update' %}active{% endif %}">
                             <i class="nav-icon bi bi-people"></i>
-                            <p>Usuários</p>
+                            <p>Gestão de Usuários</p>
                         </a>
                     </li>
 

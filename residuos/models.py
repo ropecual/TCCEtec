@@ -49,13 +49,10 @@ class RegistroColeta(models.Model):
             raise ValidationError("A quantidade deve ser maior que zero.")
 
     def save(self, *args, **kwargs):
-        """
-        Salva normalmente e depois atualiza pontuação do perfil.
-        Evita erro caso morador ainda não esteja definido.
-        """
+        is_new = self.pk is None
         super().save(*args, **kwargs)
 
-        if self.morador_id:
+        if is_new and self.morador_id:
             profile = self.morador.profile
             profile.pontos_participacao += int(self.quantidade)
             profile.save()
