@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <h4>Unidade Habitacional</h4>
+    </div>
+
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="mb-4">
+                <label class="form-label fw-semibold">Número da Unidade</label>
+                {{ form.numero }}
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-semibold">Bloco</label>
+                {{ form.bloco }}
+            </div>
+
+            <div class="d-flex justify-content-end gap-2">
+                <a href="{% url 'unidade_list' %}" class="btn btn-secondary">
+                    Cancelar
+                </a>
+                <button type="submit" class="btn btn-success">
+                    Salvar
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+{% endblock %}

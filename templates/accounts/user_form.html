@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <h4>Editar Usuário</h4>
+    </div>
+
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+
+            <h5>Dados do Usuário</h5>
+            <div class="row mb-3">
+                <div class="col-md-4">{{ form.username.label_tag }} {{ form.username }}</div>
+                <div class="col-md-4">{{ form.first_name.label_tag }} {{ form.first_name }}</div>
+                <div class="col-md-4">{{ form.last_name.label_tag }} {{ form.last_name }}</div>
+            </div>
+
+            <div class="mb-3">
+                {{ form.email.label_tag }} {{ form.email }}
+            </div>
+
+            <div class="form-check mb-3">
+                {{ form.is_active }} {{ form.is_active.label_tag }}
+            </div>
+
+            <hr>
+
+            <h5>Perfil</h5>
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    {{ profile_form.tipo.label_tag }}
+                    {{ profile_form.tipo }}
+                </div>
+                <div class="col-md-8">
+                    {{ profile_form.unidade.label_tag }}
+                    {{ profile_form.unidade }}
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-success">
+                    Salvar Alterações
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+{% endblock %}

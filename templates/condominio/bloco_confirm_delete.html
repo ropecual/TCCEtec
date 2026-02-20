@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="card">
+    <div class="card-body">
+        <h5>Deseja excluir o bloco <strong>{{ object.nome }}</strong>?</h5>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="d-flex gap-2 mt-3">
+                <button type="submit" class="btn btn-danger">
+                    Confirmar
+                </button>
+                <a href="{% url 'bloco_list' %}" class="btn btn-secondary">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

@@ -4,40 +4,79 @@
 
 <div class="card">
     <div class="card-header">
-        <h4>Condomínio</h4>
+        <h4 class="mb-0">Cadastro de Condomínio</h4>
     </div>
 
     <div class="card-body">
         <form method="post">
             {% csrf_token %}
 
-            <div class="mb-3">
-                <label>Nome</label>
+            <!-- Nome -->
+            <div class="mb-4">
+                <label class="form-label fw-semibold">Nome do Condomínio</label>
                 {{ form.nome }}
             </div>
 
-            <div class="mb-3">
-                <label>CEP</label>
-                {{ form.cep }}
-                <button type="button" class="btn btn-secondary btn-sm mt-1" onclick="buscarCep()">
-                    Buscar CEP
+            <!-- Linha CEP + Botão -->
+            <div class="row align-items-end mb-3">
+                <div class="col-md-4">
+                    <label class="form-label">CEP</label>
+                    {{ form.cep }}
+                </div>
+
+                <div class="col-md-2">
+                    <button type="button"
+                            class="btn btn-outline-secondary w-100"
+                            onclick="buscarCep()">
+                        Buscar CEP
+                    </button>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Logradouro</label>
+                    {{ form.endereco }}
+                </div>
+            </div>
+
+            <!-- Linha Número + Bairro -->
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <label class="form-label">Número</label>
+                    {{ form.numero }}
+                </div>
+
+                <div class="col-md-5">
+                    <label class="form-label">Bairro</label>
+                    {{ form.bairro }}
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Cidade</label>
+                    {{ form.cidade }}
+                </div>
+
+                <div class="col-md-1">
+                    <label class="form-label">UF</label>
+                    {{ form.estado }}
+                </div>
+            </div>
+
+            <!-- Botões -->
+            <div class="d-flex justify-content-end gap-2 mt-4">
+                <a href="{% url 'condominio_list' %}" class="btn btn-secondary">
+                    Cancelar
+                </a>
+                <button type="submit" class="btn btn-success">
+                    Salvar
                 </button>
             </div>
 
-            <div class="mb-3">
-                <label>Endereço</label>
-                {{ form.endereco }}
-            </div>
-
-            <button type="submit" class="btn btn-success">
-                Salvar
-            </button>
         </form>
-
     </div>
 </div>
 
 {% endblock %}
+
 {% block extra_js %}
 <script>
 function buscarCep() {
@@ -47,11 +86,10 @@ function buscarCep() {
         .then(response => response.json())
         .then(data => {
             if (!data.erro) {
-                document.getElementById("id_endereco").value =
-                    data.logradouro + ", " +
-                    data.bairro + " - " +
-                    data.localidade + "/" +
-                    data.uf;
+                document.getElementById("id_endereco").value = data.logradouro;
+                document.getElementById("id_bairro").value = data.bairro;
+                document.getElementById("id_cidade").value = data.localidade;
+                document.getElementById("id_estado").value = data.uf;
             } else {
                 alert("CEP não encontrado.");
             }
