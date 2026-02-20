@@ -24,9 +24,6 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         user = self.request.user
         profile = user.profile
 
-        # ===============================
-        # DEFINIR MÊS BASE
-        # ===============================
         mes_param = self.request.GET.get("mes")
 
         if mes_param:
@@ -39,9 +36,6 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context["mes_proximo"] = (data_base + relativedelta(months=1)).strftime("%Y-%m")
         context["mes_selecionado"] = data_base.strftime("%Y-%m")
 
-        # ===============================
-        # QUERY BASE DO MÊS
-        # ===============================
         queryset_mes = RegistroColeta.objects.filter(
             data__year=data_base.year,
             data__month=data_base.month
@@ -53,23 +47,16 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         if profile.tipo == "MORADOR":
 
             unidade = profile.unidade
-            bloco = None
+            bloco = unidade.bloco if unidade else None
 
-            if unidade:
-                bloco = unidade.bloco
+            queryset_unidade = queryset_mes.filter(
+                morador__profile__unidade=unidade
+            )
 
-                queryset_unidade = queryset_mes.filter(
-                    morador__profile__unidade=unidade
-                )
+            queryset_bloco = queryset_mes.filter(
+                morador__profile__unidade__bloco=bloco
+            )
 
-                queryset_bloco = queryset_mes.filter(
-                    morador__profile__unidade__bloco=bloco
-                )
-            else:
-                queryset_unidade = RegistroColeta.objects.none()
-                queryset_bloco = RegistroColeta.objects.none()
-
-            # Totais
             total_individual = queryset_mes.filter(
                 morador=user
             ).aggregate(total=Sum("quantidade"))["total"] or 0
@@ -87,7 +74,39 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             context["total_bloco"] = round(total_bloco, 2)
 
             # ===============================
-            # GRÁFICO COMPARATIVO POR MORADOR
+            # PERCENTUAIS
+            # ===============================
+            context["percent_individual"] = (
+                round((total_individual / total_unidade) * 100, 1)
+                if total_unidade > 0 else 0
+            )
+
+            context["percent_unidade"] = (
+                round((total_unidade / total_bloco) * 100, 1)
+                if total_bloco > 0 else 0
+            )
+
+            # ===============================
+            # RANKING DE UNIDADES NO BLOCO
+            # ===============================
+            ranking_unidades = (
+                queryset_bloco
+                .values("morador__profile__unidade__id",
+                        "morador__profile__unidade__numero")
+                .annotate(total=Sum("quantidade"))
+                .order_by("-total")
+            )
+
+            posicao = 0
+            for index, item in enumerate(ranking_unidades, start=1):
+                if item["morador__profile__unidade__id"] == unidade.id:
+                    posicao = index
+                    break
+
+            context["posicao_unidade"] = posicao
+
+            # ===============================
+            # GRÁFICO MORADORES (mantido)
             # ===============================
             moradores = (
                 queryset_unidade
@@ -109,15 +128,12 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             ]
 
             for index, (tipo, nome_legivel) in enumerate(TipoResiduo.choices):
-
                 valores = []
-
                 for morador in moradores:
                     total = queryset_unidade.filter(
                         morador__id=morador["morador__id"],
                         tipo_residuo=tipo
                     ).aggregate(total=Sum("quantidade"))["total"] or 0
-
                     valores.append(float(total))
 
                 datasets.append({
@@ -129,35 +145,26 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             context["labels"] = json.dumps(labels)
             context["datasets"] = json.dumps(datasets)
 
-        # ============================================================
-        # VISÃO ADMIN
-        # ============================================================
-        else:
-
-            total_geral = queryset_mes.aggregate(
-                total=Sum("quantidade")
-            )["total"] or 0
-
-            context["total_geral"] = round(total_geral, 2)
-
-            dados = (
+            # ===============================
+            # RANKING DE BLOCOS (para gráfico)
+            # ===============================
+            ranking_blocos = (
                 queryset_mes
-                .values("tipo_residuo")
+                .values("morador__profile__unidade__bloco__nome")
                 .annotate(total=Sum("quantidade"))
+                .order_by("-total")
             )
 
-            labels = []
-            valores = []
+            blocos_labels = [
+                item["morador__profile__unidade__bloco__nome"]
+                for item in ranking_blocos
+            ]
 
-            for tipo, _ in TipoResiduo.choices:
-                labels.append(tipo.capitalize())
-                total = next(
-                    (item["total"] for item in dados if item["tipo_residuo"] == tipo),
-                    0
-                )
-                valores.append(float(total) if total else 0)
+            blocos_valores = [
+                float(item["total"]) for item in ranking_blocos
+            ]
 
-            context["labels"] = json.dumps(labels)
-            context["valores"] = json.dumps(valores)
+            context["blocos_labels"] = json.dumps(blocos_labels)
+            context["blocos_valores"] = json.dumps(blocos_valores)
 
         return context

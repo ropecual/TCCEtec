@@ -7,47 +7,35 @@
 <!-- ===================== -->
 <div class="row mb-4">
 
-    {% if user.profile.tipo == "MORADOR" %}
-
-        <div class="col-md-4 mb-3">
-            <div class="card text-bg-primary shadow-sm">
-                <div class="card-body text-center">
-                    <h3 class="fw-bold">{{ total_individual }} kg</h3>
-                    <p class="mb-0">Você reciclou (mês)</p>
-                </div>
+    <div class="col-md-4">
+        <div class="card border-primary shadow-sm">
+            <div class="card-body text-center">
+                <h6>% Sua contribuição na unidade</h6>
+                <h3 class="text-primary">{{ percent_individual }}%</h3>
             </div>
         </div>
+    </div>
 
-        <div class="col-md-4 mb-3">
-            <div class="card text-bg-success shadow-sm">
-                <div class="card-body text-center">
-                    <h3 class="fw-bold">{{ total_unidade }} kg</h3>
-                    <p class="mb-0">Total da Unidade (mês)</p>
-                </div>
+    <div class="col-md-4">
+        <div class="card border-success shadow-sm">
+            <div class="card-body text-center">
+                <h6>% Sua unidade no bloco</h6>
+                <h3 class="text-success">{{ percent_unidade }}%</h3>
             </div>
         </div>
+    </div>
 
-        <div class="col-md-4 mb-3">
-            <div class="card text-bg-warning shadow-sm">
-                <div class="card-body text-center">
-                    <h3 class="fw-bold">{{ total_bloco }} kg</h3>
-                    <p class="mb-0">Total do Bloco (mês)</p>
-                </div>
+    <div class="col-md-4">
+        <div class="card border-warning shadow-sm">
+            <div class="card-body text-center">
+                <h6>Posição da sua unidade</h6>
+                <h3 class="text-warning">#{{ posicao_unidade }}</h3>
+                <span class="badge bg-warning text-dark">
+                    Ranking do bloco
+                </span>
             </div>
         </div>
-
-    {% else %}
-
-        <div class="col-md-4 mb-3">
-            <div class="card text-bg-success shadow-sm">
-                <div class="card-body text-center">
-                    <h3 class="fw-bold">{{ total_geral }} kg</h3>
-                    <p class="mb-0">Total Geral do Sistema (mês)</p>
-                </div>
-            </div>
-        </div>
-
-    {% endif %}
+    </div>
 
 </div>
 
@@ -103,6 +91,14 @@
     </div>
 </div>
 
+<div class="card shadow-sm mt-4">
+    <div class="card-header">
+        <h5>Ranking de Blocos (Mensal)</h5>
+    </div>
+    <div class="card-body">
+        <canvas id="graficoBlocos"></canvas>
+    </div>
+</div>
 {% endblock %}
 
 
@@ -160,5 +156,25 @@ new Chart(ctx, {
 });
 
 {% endif %}
+
+const ctxBlocos = document.getElementById('graficoBlocos');
+
+new Chart(ctxBlocos, {
+    type: 'bar',
+    data: {
+        labels: {{ blocos_labels|safe }},
+        datasets: [{
+            label: 'Kg reciclados por bloco',
+            data: {{ blocos_valores|safe }},
+            backgroundColor: 'rgba(255, 159, 64, 0.7)'
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: { beginAtZero: true }
+        }
+    }
+});
 </script>
 {% endblock %}
