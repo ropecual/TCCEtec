@@ -45,91 +45,120 @@
         <div class="sidebar-wrapper">
 
             <nav class="mt-2">
-                <ul class="nav nav-pills nav-sidebar flex-column"
-                    role="menu">
+                <ul class="nav nav-pills nav-sidebar flex-column" role="menu">
 
-                    <!-- DASHBOARD -->
-                    <li class="nav-item">
-                        <a href="{% url 'dashboard' %}"
-                           class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
-                            <i class="nav-icon bi bi-speedometer2"></i>
-                            <p>Dashboard</p>
-                        </a>
-                    </li>
+    <!-- DASHBOARD (todos logados) -->
+    <li class="nav-item">
+        <a href="{% url 'dashboard' %}"
+           class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+            <i class="nav-icon bi bi-speedometer2"></i>
+            <p>Dashboard</p>
+        </a>
+    </li>
 
-                    {% if user.is_authenticated and user.profile.tipo == "ADMIN" %}
+    {% if user.is_authenticated %}
 
-                    <li class="nav-header">ADMINISTRAÇÃO</li>
+        <!-- ================= ADMIN ================= -->
+        {% if user.profile.tipo == "ADMIN" %}
 
-                    <li class="nav-item">
-                        <a href="{% url 'condominio_list' %}"
-                           class="nav-link {% if request.resolver_match.url_name == 'condominio_list' %}active{% endif %}">
-                            <i class="nav-icon bi bi-building"></i>
-                            <p>Condomínios</p>
-                        </a>
-                    </li>
+            <li class="nav-header">ADMINISTRAÇÃO GLOBAL</li>
 
-                    <li class="nav-item">
-                        <a href="{% url 'bloco_list' %}"
-                           class="nav-link {% if request.resolver_match.url_name == 'bloco_list' %}active{% endif %}">
-                            <i class="nav-icon bi bi-layers"></i>
-                            <p>Blocos</p>
-                        </a>
-                    </li>
+            <li class="nav-item">
+                <a href="{% url 'condominio_list' %}"
+                   class="nav-link {% if request.resolver_match.url_name == 'condominio_list' %}active{% endif %}">
+                    <i class="nav-icon bi bi-building"></i>
+                    <p>Condomínios</p>
+                </a>
+            </li>
 
-                    <li class="nav-item">
-                        <a href="{% url 'unidade_list' %}"
-                           class="nav-link {% if request.resolver_match.url_name == 'unidade_list' %}active{% endif %}">
-                            <i class="nav-icon bi bi-house"></i>
-                            <p>Unidades</p>
-                        </a>
-                    </li>
+            <li class="nav-item">
+                <a href="{% url 'bloco_list' %}"
+                   class="nav-link {% if request.resolver_match.url_name == 'bloco_list' %}active{% endif %}">
+                    <i class="nav-icon bi bi-layers"></i>
+                    <p>Blocos</p>
+                </a>
+            </li>
 
-                    <li class="nav-item">
-                        <a href="{% url 'user_list' %}"
-                           class="nav-link {% if request.resolver_match.url_name in 'user_list user_update' %}active{% endif %}">
-                            <i class="nav-icon bi bi-people"></i>
-                            <p>Gestão de Usuários</p>
-                        </a>
-                    </li>
+            <li class="nav-item">
+                <a href="{% url 'unidade_list' %}"
+                   class="nav-link {% if request.resolver_match.url_name == 'unidade_list' %}active{% endif %}">
+                    <i class="nav-icon bi bi-house"></i>
+                    <p>Unidades</p>
+                </a>
+            </li>
 
-                    <li class="nav-header">SISTEMA</li>
+            <li class="nav-item">
+                <a href="{% url 'user_list' %}"
+                   class="nav-link {% if request.resolver_match.url_name in 'user_list user_update user_create' %}active{% endif %}">
+                    <i class="nav-icon bi bi-people"></i>
+                    <p>Gestão de Usuários</p>
+                </a>
+            </li>
 
-                    <li class="nav-item">
-                        <a href="{% url 'admin_area' %}" class="nav-link">
-                            <i class="nav-icon bi bi-shield-lock"></i>
-                            <p>Área Administrativa</p>
-                        </a>
-                    </li>
+            <li class="nav-header">SISTEMA</li>
 
-                    <li class="nav-item">
-                        <a href="/admin/" class="nav-link">
-                            <i class="nav-icon bi bi-gear"></i>
-                            <p>Painel Django</p>
-                        </a>
-                    </li>
+            <li class="nav-item">
+                <a href="/admin/" class="nav-link">
+                    <i class="nav-icon bi bi-gear"></i>
+                    <p>Painel Django</p>
+                </a>
+            </li>
 
-                    {% elif user.is_authenticated and user.profile.tipo == "MORADOR" %}
+        <!-- ================= SÍNDICO ================= -->
+        {% elif user.profile.tipo == "SINDICO" %}
 
-                    <li class="nav-header">MINHA ÁREA</li>
+            <li class="nav-header">MEU CONDOMÍNIO</li>
 
-                    <li class="nav-item">
-                        <a href="{% url 'registrar_residuo' %}" class="nav-link">
-                            <i class="nav-icon bi bi-recycle"></i>
-                            <p>Registrar Resíduo</p>
-                        </a>
-                    </li>
+            <li class="nav-item">
+                <a href="{% url 'bloco_list' %}"
+                   class="nav-link {% if request.resolver_match.url_name == 'bloco_list' %}active{% endif %}">
+                    <i class="nav-icon bi bi-layers"></i>
+                    <p>Blocos</p>
+                </a>
+            </li>
 
-                    <li class="nav-item">
-                        <a href="{% url 'meus_registros' %}" class="nav-link">
-                            <i class="nav-icon bi bi-clock-history"></i>
-                            <p>Meu Histórico</p>
-                        </a>
-                    </li>
+            <li class="nav-item">
+                <a href="{% url 'unidade_list' %}"
+                   class="nav-link {% if request.resolver_match.url_name == 'unidade_list' %}active{% endif %}">
+                    <i class="nav-icon bi bi-house"></i>
+                    <p>Unidades</p>
+                </a>
+            </li>
 
-                    {% endif %}
+            <li class="nav-item">
+                <a href="{% url 'user_list' %}"
+                   class="nav-link {% if request.resolver_match.url_name in 'user_list user_update user_create' %}active{% endif %}">
+                    <i class="nav-icon bi bi-people"></i>
+                    <p>Moradores</p>
+                </a>
+            </li>
 
-                </ul>
+        <!-- ================= MORADOR ================= -->
+        {% elif user.profile.tipo == "MORADOR" %}
+
+            <li class="nav-header">MINHA ÁREA</li>
+
+            <li class="nav-item">
+                <a href="{% url 'registrar_residuo' %}"
+                   class="nav-link {% if request.resolver_match.url_name == 'registrar_residuo' %}active{% endif %}">
+                    <i class="nav-icon bi bi-recycle"></i>
+                    <p>Registrar Resíduo</p>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="{% url 'meus_registros' %}"
+                   class="nav-link {% if request.resolver_match.url_name == 'meus_registros' %}active{% endif %}">
+                    <i class="nav-icon bi bi-clock-history"></i>
+                    <p>Meu Histórico</p>
+                </a>
+            </li>
+
+        {% endif %}
+
+    {% endif %}
+
+</ul>
             </nav>
 
         </div>

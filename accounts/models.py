@@ -7,6 +7,7 @@ class Profile(models.Model):
 
     TIPO_CHOICES = (
         ('MORADOR', 'Morador'),
+        ('SINDICO', 'Síndico'),
         ('ADMIN', 'Administrador'),
     )
 
@@ -19,6 +20,13 @@ class Profile(models.Model):
         null=True,
         blank=True,
         related_name='moradores'
+    )
+    condominio = models.ForeignKey(
+        'condominio.Condominio',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='sindicos'
     )
 
     def __str__(self):

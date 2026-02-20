@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h3 class="mb-4">Painel do Síndico</h3>
+
+<!-- ======================= TOTAL ======================= -->
+
+<div class="row mb-4">
+    <div class="col-md-6 mx-auto">
+        <div class="card text-bg-primary text-center shadow-sm">
+            <div class="card-body">
+                <h2>{{ total_condominio }} kg</h2>
+                <p>Total do Condomínio (mês)</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ======================= GRÁFICOS ======================= -->
+
+<div class="row">
+
+    <!-- BLOCO -->
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                Ranking de Blocos
+            </div>
+            <div class="card-body">
+                <canvas id="graficoBlocos"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- UNIDADES -->
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                Ranking de Unidades
+            </div>
+            <div class="card-body">
+                <canvas id="graficoUnidades"></canvas>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ======================= TABELAS COM MEDALHAS ======================= -->
+
+<div class="row mt-4">
+
+    <!-- BLOCO -->
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header">Ranking de Blocos</div>
+            <div class="card-body">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>Posição</th>
+                            <th>Bloco</th>
+                            <th>Total (kg)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in ranking_blocos %}
+                        <tr>
+                            <td>
+                                {% if forloop.counter == 1 %}
+                                    🥇
+                                {% elif forloop.counter == 2 %}
+                                    🥈
+                                {% elif forloop.counter == 3 %}
+                                    🥉
+                                {% else %}
+                                    {{ forloop.counter }}
+                                {% endif %}
+                            </td>
+                            <td>{{ item.morador__profile__unidade__bloco__nome }}</td>
+                            <td><strong>{{ item.total }}</strong></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- UNIDADE -->
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header">Ranking de Unidades</div>
+            <div class="card-body">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>Posição</th>
+                            <th>Bloco</th>
+                            <th>Unidade</th>
+                            <th>Total (kg)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in ranking_unidades %}
+                        <tr>
+                            <td>
+                                {% if forloop.counter == 1 %}
+                                    🥇
+                                {% elif forloop.counter == 2 %}
+                                    🥈
+                                {% elif forloop.counter == 3 %}
+                                    🥉
+                                {% else %}
+                                    {{ forloop.counter }}
+                                {% endif %}
+                            </td>
+                            <td>{{ item.morador__profile__unidade__bloco__nome }}</td>
+                            <td>{{ item.morador__profile__unidade__numero }}</td>
+                            <td><strong>{{ item.total }}</strong></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+// BLOCO
+new Chart(document.getElementById('graficoBlocos'), {
+    type: 'bar',
+    data: {
+        labels: {{ blocos_labels|safe }},
+        datasets: [{
+            label: 'Kg reciclados',
+            data: {{ blocos_valores|safe }},
+            backgroundColor: 'rgba(54, 162, 235, 0.7)'
+        }]
+    },
+    options: {
+        indexAxis: 'y',
+        responsive: true,
+        plugins: {
+            legend: { display: false }
+        }
+    }
+});
+
+// UNIDADE
+new Chart(document.getElementById('graficoUnidades'), {
+    type: 'bar',
+    data: {
+        labels: {{ unidades_labels|safe }},
+        datasets: [{
+            label: 'Kg reciclados',
+            data: {{ unidades_valores|safe }},
+            backgroundColor: 'rgba(255, 159, 64, 0.7)'
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: false }
+        }
+    }
+});
+
+</script>
+
+{% endblock %}

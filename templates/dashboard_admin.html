@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h3>Painel Administrativo Global</h3>
+
+<div class="card mb-4">
+    <div class="card-body text-center">
+        <h4>{{ total_geral }} kg</h4>
+        <p>Total Geral do Sistema (mês)</p>
+    </div>
+</div>
+
+<form method="get" class="mb-3">
+    <select name="condominio" class="form-select">
+        <option value="">Todos os condomínios</option>
+        {% for cond in condominios %}
+        <option value="{{ cond.id }}">{{ cond.nome }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-primary mt-2">Filtrar</button>
+</form>
+
+<h5>Ranking de Condomínios</h5>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Condomínio</th>
+            <th>Total (kg)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for cond in ranking_condominios %}
+        <tr>
+            <td>{{ cond.morador__profile__unidade__bloco__condominio__nome }}</td>
+            <td>{{ cond.total }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

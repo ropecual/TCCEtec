@@ -46,21 +46,23 @@
 
             <h5 class="mb-3">Perfil</h5>
 
-            <div class="row mb-4">
+            <div class="row mb-3">
                 <div class="col-md-4">
                     {{ profile_form.tipo.label_tag }}
                     {{ profile_form.tipo }}
                 </div>
-                <div class="col-md-8">
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    {{ profile_form.condominio.label_tag }}
+                    {{ profile_form.condominio }}
+                </div>
+
+                <div class="col-md-6">
                     {{ profile_form.unidade.label_tag }}
                     {{ profile_form.unidade }}
                 </div>
-            </div>
-
-            <div class="d-flex justify-content-end">
-                <button type="submit" class="btn btn-success">
-                    Criar Usuário
-                </button>
             </div>
 
         </form>

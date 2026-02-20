@@ -24,10 +24,11 @@ class UserCreateForm(forms.ModelForm):
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ["tipo", "unidade"]
+        fields = ["tipo", "condominio", "unidade"]
 
         widgets = {
             "tipo": forms.Select(attrs={"class": "form-select"}),
+            "condominio": forms.Select(attrs={"class": "form-select"}),
             "unidade": forms.Select(attrs={"class": "form-select"}),
         }
 

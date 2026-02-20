@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- ================= HEADER ================= -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="mb-0">Meu Painel de Reciclagem</h3>
+
+    <div class="d-flex align-items-center gap-2">
+        <a href="?mes={{ mes_anterior }}" class="btn btn-outline-secondary btn-sm">
+            ←
+        </a>
+
+        <form method="get" class="d-flex align-items-center gap-2">
+            <input type="month"
+                   name="mes"
+                   value="{{ mes_selecionado }}"
+                   class="form-control form-control-sm">
+            <button type="submit" class="btn btn-primary btn-sm">
+                Ir
+            </button>
+        </form>
+
+        <a href="?mes={{ mes_proximo }}" class="btn btn-outline-secondary btn-sm">
+            →
+        </a>
+    </div>
+</div>
+
+<!-- ================= CARDS PRINCIPAIS ================= -->
+<div class="row mb-4">
+
+    <div class="col-md-4 mb-3">
+        <div class="card shadow-sm border-0 bg-primary text-white">
+            <div class="card-body text-center">
+                <h2 class="fw-bold">{{ total_individual }} kg</h2>
+                <small>Você reciclou no mês</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <div class="card shadow-sm border-0 bg-success text-white">
+            <div class="card-body text-center">
+                <h2 class="fw-bold">{{ total_unidade }} kg</h2>
+                <small>Total da sua unidade</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <div class="card shadow-sm border-0 bg-warning text-dark">
+            <div class="card-body text-center">
+                <h2 class="fw-bold">{{ total_bloco }} kg</h2>
+                <small>Total do seu bloco</small>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ================= INDICADORES ================= -->
+<div class="row mb-4">
+
+    <div class="col-md-4 mb-3">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <h6>Sua contribuição na unidade</h6>
+                <h3 class="text-primary">{{ percent_individual }}%</h3>
+                <div class="progress">
+                    <div class="progress-bar bg-primary"
+                         style="width: {{ percent_individual }}%">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <h6>Participação da unidade no bloco</h6>
+                <h3 class="text-success">{{ percent_unidade }}%</h3>
+                <div class="progress">
+                    <div class="progress-bar bg-success"
+                         style="width: {{ percent_unidade }}%">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <h6>Ranking no bloco</h6>
+                <h3 class="text-warning">#{{ posicao_unidade }}</h3>
+                <span class="badge bg-warning text-dark">
+                    Sua unidade no ranking
+                </span>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ================= GRÁFICO UNIDADE ================= -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Reciclagem da Unidade por Morador</h5>
+    </div>
+    <div class="card-body">
+        <canvas id="graficoUnidade"></canvas>
+    </div>
+</div>
+
+<!-- ================= GRÁFICO BLOCO ================= -->
+<div class="card shadow-sm">
+    <div class="card-header">
+        <h5 class="mb-0">Ranking de Blocos</h5>
+    </div>
+    <div class="card-body">
+        <canvas id="graficoBloco"></canvas>
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+/* ================= GRÁFICO UNIDADE ================= */
+const ctxUnidade = document.getElementById('graficoUnidade');
+
+new Chart(ctxUnidade, {
+    type: 'bar',
+    data: {
+        labels: {{ labels|safe }},
+        datasets: {{ datasets|safe }}
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { position: 'top' }
+        },
+        scales: {
+            x: { stacked: true },
+            y: { stacked: true, beginAtZero: true }
+        }
+    }
+});
+
+/* ================= GRÁFICO BLOCO ================= */
+const ctxBloco = document.getElementById('graficoBloco');
+
+new Chart(ctxBloco, {
+    type: 'bar',
+    data: {
+        labels: {{ blocos_labels|safe }},
+        datasets: [{
+            label: 'Kg reciclados',
+            data: {{ blocos_valores|safe }},
+            backgroundColor: 'rgba(255, 159, 64, 0.7)'
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { position: 'top' }
+        },
+        scales: {
+            y: { beginAtZero: true }
+        }
+    }
+});
+</script>
+{% endblock %}

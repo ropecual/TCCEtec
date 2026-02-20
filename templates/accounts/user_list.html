@@ -20,33 +20,91 @@
                     <tr>
                         <th>Username</th>
                         <th>Tipo</th>
+                        <th>Condomínio</th>
+                        <th>Bloco</th>
                         <th>Unidade</th>
                         <th>Pontos</th>
                         <th class="text-center">Ações</th>
                     </tr>
                 </thead>
+
                 <tbody>
                     {% for user in usuarios %}
                     <tr>
-                        <td><strong>{{ user.username }}</strong></td>
-                        <td>{{ user.profile.tipo }}</td>
-                        <td>{{ user.profile.unidade }}</td>
-                        <td>{{ user.profile.pontos_participacao }}</td>
+
+                        <!-- Username -->
+                        <td>
+                            <strong>{{ user.username }}</strong>
+                        </td>
+
+                        <!-- Tipo -->
+                        <td>
+                            <span class="badge
+                                {% if user.profile.tipo == 'ADMIN' %}
+                                    bg-danger
+                                {% elif user.profile.tipo == 'SINDICO' %}
+                                    bg-warning text-dark
+                                {% else %}
+                                    bg-primary
+                                {% endif %}
+                            ">
+                                {{ user.profile.tipo }}
+                            </span>
+                        </td>
+
+                        <!-- Condomínio -->
+                        <td>
+                            {% if user.profile.condominio %}
+                                {{ user.profile.condominio.nome }}
+                            {% elif user.profile.unidade %}
+                                {{ user.profile.unidade.bloco.condominio.nome }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+
+                        <!-- Bloco -->
+                        <td>
+                            {% if user.profile.unidade %}
+                                {{ user.profile.unidade.bloco.nome }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+
+                        <!-- Unidade -->
+                        <td>
+                            {% if user.profile.unidade %}
+                                {{ user.profile.unidade.numero }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+
+                        <!-- Pontos -->
+                        <td>
+                            {{ user.profile.pontos_participacao }}
+                        </td>
+
+                        <!-- Ações -->
                         <td class="text-center">
                             <a href="{% url 'user_update' user.pk %}"
                                class="btn btn-warning btn-sm">
+                                <i class="bi bi-pencil"></i>
                                 Editar
                             </a>
                         </td>
+
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="5" class="text-center">
+                        <td colspan="7" class="text-center">
                             Nenhum usuário cadastrado.
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
+
             </table>
         </div>
     </div>

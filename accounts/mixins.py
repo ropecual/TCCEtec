@@ -13,3 +13,17 @@ class AdminRequiredMixin(LoginRequiredMixin):
             raise PermissionDenied("Você não tem permissão para acessar esta área.")
 
         return super().dispatch(request, *args, **kwargs)
+
+
+
+class SindicoOrAdminMixin:
+
+    def dispatch(self, request, *args, **kwargs):
+
+        if not request.user.is_authenticated:
+            raise PermissionDenied()
+
+        if request.user.profile.tipo not in ["ADMIN", "SINDICO"]:
+            raise PermissionDenied()
+
+        return super().dispatch(request, *args, **kwargs)
