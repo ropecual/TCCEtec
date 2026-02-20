@@ -144,6 +144,31 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         )["total"] or 0
 
         # =============================
+        # TOTAL POR TIPO DE RESÍDUO
+        # =============================
+        dados_residuos = (
+            queryset_condominio
+            .values("tipo_residuo")
+            .annotate(total=Sum("quantidade"))
+            .order_by("-total")
+        )
+
+        residuos_labels = []
+        residuos_valores = []
+
+        for tipo, nome_legivel in TipoResiduo.choices:
+            total = next(
+                (item["total"] for item in dados_residuos if item["tipo_residuo"] == tipo),
+                0
+            )
+            residuos_labels.append(nome_legivel)
+            residuos_valores.append(float(total) if total else 0)
+
+        # Resíduo mais reciclado
+        residuo_campeao = dados_residuos[0]["tipo_residuo"] if dados_residuos else None
+        total_campeao = dados_residuos[0]["total"] if dados_residuos else 0
+
+        # =============================
         # RANKING DE BLOCOS
         # =============================
         ranking_blocos = list(
@@ -152,6 +177,16 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             .annotate(total=Sum("quantidade"))
             .order_by("-total")
         )
+
+        blocos_labels = [
+            item["morador__profile__unidade__bloco__nome"]
+            for item in ranking_blocos
+        ]
+
+        blocos_valores = [
+            float(item["total"])
+            for item in ranking_blocos
+        ]
 
         # =============================
         # RANKING DE UNIDADES
@@ -166,22 +201,6 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             .order_by("-total")
         )
 
-        # =============================
-        # GRÁFICO BLOCOS
-        # =============================
-        blocos_labels = [
-            item["morador__profile__unidade__bloco__nome"]
-            for item in ranking_blocos
-        ]
-
-        blocos_valores = [
-            float(item["total"])
-            for item in ranking_blocos
-        ]
-
-        # =============================
-        # GRÁFICO UNIDADES
-        # =============================
         unidades_labels = [
             f'{item["morador__profile__unidade__bloco__nome"]} - {item["morador__profile__unidade__numero"]}'
             for item in ranking_unidades
@@ -192,10 +211,29 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             for item in ranking_unidades
         ]
 
+        # =============================
+        # RANKING DE UNIDADES POR BLOCO (AGRUPADO)
+        # =============================
+
+        ranking_unidades_por_bloco = {}
+
+        for item in ranking_unidades:
+            bloco_nome = item["morador__profile__unidade__bloco__nome"]
+
+            if bloco_nome not in ranking_unidades_por_bloco:
+                ranking_unidades_por_bloco[bloco_nome] = []
+
+            ranking_unidades_por_bloco[bloco_nome].append(item)
+
         return {
             "total_condominio": round(total_condominio, 2),
             "ranking_blocos": ranking_blocos,
             "ranking_unidades": ranking_unidades,
+            "ranking_unidades_por_bloco": ranking_unidades_por_bloco,
+            "residuos_labels": json.dumps(residuos_labels),
+            "residuos_valores": json.dumps(residuos_valores),
+            "residuo_campeao": residuo_campeao,
+            "total_campeao": total_campeao,
             "blocos_labels": json.dumps(blocos_labels),
             "blocos_valores": json.dumps(blocos_valores),
             "unidades_labels": json.dumps(unidades_labels),
@@ -203,7 +241,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         }
 
     # ============================================================
-    # ADMIN
+    # MORADOR
     # ============================================================
 
     def _dashboard_morador(self, queryset_mes, user):

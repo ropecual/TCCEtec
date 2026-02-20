@@ -1,13 +1,58 @@
 {% extends 'base.html' %}
-
 {% block content %}
 
 <h3 class="mb-4">Painel do Síndico</h3>
 
-<!-- ======================= TOTAL ======================= -->
+<!-- CONTROLE DE MÊS -->
 
 <div class="row mb-4">
-    <div class="col-md-6 mx-auto">
+    <div class="col-md-8 mx-auto">
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+
+                <div class="d-flex justify-content-center align-items-center gap-3 flex-wrap">
+
+                    <!-- MÊS ANTERIOR -->
+                    <a href="?mes={{ mes_anterior }}"
+                       class="btn btn-outline-secondary">
+                        ← Mês anterior
+                    </a>
+
+                    <!-- SELETOR -->
+                    <form method="get" class="d-flex align-items-center gap-2">
+
+                        <input type="month"
+                               name="mes"
+                               value="{{ mes_selecionado }}"
+                               class="form-control"
+                               style="max-width: 180px;">
+
+                        <button type="submit"
+                                class="btn btn-primary">
+                            Ir
+                        </button>
+                    </form>
+
+                    <!-- PRÓXIMO MÊS -->
+                    <a href="?mes={{ mes_proximo }}"
+                       class="btn btn-outline-secondary">
+                        Próximo mês →
+                    </a>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- CARDS PRINCIPAIS -->
+
+<div class="row mb-4">
+
+    <div class="col-md-4">
         <div class="card text-bg-primary text-center shadow-sm">
             <div class="card-body">
                 <h2>{{ total_condominio }} kg</h2>
@@ -15,30 +60,44 @@
             </div>
         </div>
     </div>
+
+    <div class="col-md-4">
+        <div class="card text-bg-success text-center shadow-sm">
+            <div class="card-body">
+                <h4>🏆 Resíduo Campeão</h4>
+                <h5>{{ residuo_campeao }}</h5>
+                <p>{{ total_campeao }} kg</p>
+            </div>
+        </div>
+    </div>
+
 </div>
 
-<!-- ======================= GRÁFICOS ======================= -->
+<!-- GRÁFICOS -->
 
-<div class="row">
+<div class="row mb-4">
 
-    <!-- BLOCO -->
-    <div class="col-md-6">
+    <div class="col-md-4">
         <div class="card shadow-sm">
-            <div class="card-header">
-                Ranking de Blocos
+            <div class="card-header">Distribuição por Tipo</div>
+            <div class="card-body">
+                <canvas id="graficoResiduos"></canvas>
             </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-header">Ranking de Blocos</div>
             <div class="card-body">
                 <canvas id="graficoBlocos"></canvas>
             </div>
         </div>
     </div>
 
-    <!-- UNIDADES -->
-    <div class="col-md-6">
+    <div class="col-md-4">
         <div class="card shadow-sm">
-            <div class="card-header">
-                Ranking de Unidades
-            </div>
+            <div class="card-header">Ranking Total de Unidades</div>
             <div class="card-body">
                 <canvas id="graficoUnidades"></canvas>
             </div>
@@ -47,36 +106,31 @@
 
 </div>
 
-<!-- ======================= TABELAS COM MEDALHAS ======================= -->
+<!-- TABELAS DE RANKING -->
 
-<div class="row mt-4">
+<div class="row">
 
-    <!-- BLOCO -->
-    <div class="col-md-6">
+    <!-- RANKING BLOCO -->
+    <div class="col-md-4">
         <div class="card shadow-sm">
             <div class="card-header">Ranking de Blocos</div>
             <div class="card-body">
                 <table class="table table-striped align-middle">
                     <thead>
                         <tr>
-                            <th>Posição</th>
+                            <th>#</th>
                             <th>Bloco</th>
-                            <th>Total (kg)</th>
+                            <th>Kg</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for item in ranking_blocos %}
                         <tr>
                             <td>
-                                {% if forloop.counter == 1 %}
-                                    🥇
-                                {% elif forloop.counter == 2 %}
-                                    🥈
-                                {% elif forloop.counter == 3 %}
-                                    🥉
-                                {% else %}
-                                    {{ forloop.counter }}
-                                {% endif %}
+                                {% if forloop.counter == 1 %}🥇
+                                {% elif forloop.counter == 2 %}🥈
+                                {% elif forloop.counter == 3 %}🥉
+                                {% else %}{{ forloop.counter }}{% endif %}
                             </td>
                             <td>{{ item.morador__profile__unidade__bloco__nome }}</td>
                             <td><strong>{{ item.total }}</strong></td>
@@ -88,41 +142,74 @@
         </div>
     </div>
 
-    <!-- UNIDADE -->
-    <div class="col-md-6">
+    <!-- RANKING TOTAL UNIDADES -->
+    <div class="col-md-4">
         <div class="card shadow-sm">
-            <div class="card-header">Ranking de Unidades</div>
+            <div class="card-header">Ranking Total de Unidades</div>
             <div class="card-body">
                 <table class="table table-striped align-middle">
                     <thead>
                         <tr>
-                            <th>Posição</th>
-                            <th>Bloco</th>
+                            <th>#</th>
                             <th>Unidade</th>
-                            <th>Total (kg)</th>
+                            <th>Kg</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for item in ranking_unidades %}
                         <tr>
                             <td>
-                                {% if forloop.counter == 1 %}
-                                    🥇
-                                {% elif forloop.counter == 2 %}
-                                    🥈
-                                {% elif forloop.counter == 3 %}
-                                    🥉
-                                {% else %}
-                                    {{ forloop.counter }}
-                                {% endif %}
+                                {% if forloop.counter == 1 %}🥇
+                                {% elif forloop.counter == 2 %}🥈
+                                {% elif forloop.counter == 3 %}🥉
+                                {% else %}{{ forloop.counter }}{% endif %}
                             </td>
-                            <td>{{ item.morador__profile__unidade__bloco__nome }}</td>
-                            <td>{{ item.morador__profile__unidade__numero }}</td>
+                            <td>
+                                {{ item.morador__profile__unidade__bloco__nome }} -
+                                {{ item.morador__profile__unidade__numero }}
+                            </td>
                             <td><strong>{{ item.total }}</strong></td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- RANKING POR BLOCO AGRUPADO -->
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-header">Ranking de Unidades por Bloco</div>
+            <div class="card-body">
+
+                {% for bloco, unidades in ranking_unidades_por_bloco.items %}
+                    <h6 class="mt-3">{{ bloco }}</h6>
+                    <table class="table table-sm table-striped">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Unidade</th>
+                                <th>Kg</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in unidades %}
+                            <tr>
+                                <td>
+                                    {% if forloop.counter == 1 %}🥇
+                                    {% elif forloop.counter == 2 %}🥈
+                                    {% elif forloop.counter == 3 %}🥉
+                                    {% else %}{{ forloop.counter }}{% endif %}
+                                </td>
+                                <td>{{ item.morador__profile__unidade__numero }}</td>
+                                <td>{{ item.total }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endfor %}
+
             </div>
         </div>
     </div>
@@ -132,50 +219,47 @@
 {% endblock %}
 
 {% block extra_js %}
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
 
-// BLOCO
+new Chart(document.getElementById('graficoResiduos'), {
+    type: 'doughnut',
+    data: {
+        labels: {{ residuos_labels|safe }},
+        datasets: [{
+            data: {{ residuos_valores|safe }},
+            backgroundColor: [
+                '#36A2EB','#FF6384','#4BC0C0',
+                '#9966FF','#FFCE56','#C9CBCF'
+            ]
+        }]
+    }
+});
+
 new Chart(document.getElementById('graficoBlocos'), {
     type: 'bar',
     data: {
         labels: {{ blocos_labels|safe }},
         datasets: [{
-            label: 'Kg reciclados',
             data: {{ blocos_valores|safe }},
-            backgroundColor: 'rgba(54, 162, 235, 0.7)'
+            backgroundColor: 'rgba(54,162,235,0.7)'
         }]
     },
-    options: {
-        indexAxis: 'y',
-        responsive: true,
-        plugins: {
-            legend: { display: false }
-        }
-    }
+    options: { indexAxis: 'y', plugins: { legend: { display: false } } }
 });
 
-// UNIDADE
 new Chart(document.getElementById('graficoUnidades'), {
     type: 'bar',
     data: {
         labels: {{ unidades_labels|safe }},
         datasets: [{
-            label: 'Kg reciclados',
             data: {{ unidades_valores|safe }},
-            backgroundColor: 'rgba(255, 159, 64, 0.7)'
+            backgroundColor: 'rgba(255,159,64,0.7)'
         }]
     },
-    options: {
-        responsive: true,
-        plugins: {
-            legend: { display: false }
-        }
-    }
+    options: { plugins: { legend: { display: false } } }
 });
 
 </script>
-
 {% endblock %}
